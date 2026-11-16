@@ -26,23 +26,6 @@ export const Footer: React.FC = () => {
               Crafted with <Heart size={14} className="fill-cherry-500 text-cherry-500" /> for numerical fluency
             </span>
           </div>
-          <p className="text-xs text-midnight-900/60 dark:text-cream-200/50 max-w-lg leading-relaxed">
-            Inspired by Zetamac, Nintendo DS Brain Training, childhood math arcades and indie games.
-            Designed especially to build rapid calculator-free fluency for the ESAT, TMUA, and everyday genius.
-          </p>
-        </div>
-
-        {/* Badges / offline note */}
-        <div className="flex items-center gap-4 text-[11px] font-mono text-midnight-900/50 dark:text-cream-200/40">
-          <span className="flex items-center gap-1">
-            <Sparkles size={12} /> 100% Client-Side
-          </span>
-          <span>•</span>
-          <span className="flex items-center gap-1">
-            <Zap size={12} /> Zero Logins
-          </span>
-          <span>•</span>
-          <span>Instant Offline Play</span>
         </div>
       </div>
     </footer>

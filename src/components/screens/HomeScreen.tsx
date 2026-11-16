@@ -89,16 +89,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             MENTAL CALCULUS
           </Button>
         </div>
-
-        {/* Instant play reassurance */}
-        <div className="flex items-center justify-center gap-4 text-xs font-mono text-midnight-900/60 dark:text-cream-200/50 mt-4">
-          <span className="flex items-center gap-1">⚡ Instant Play</span>
-          <span>•</span>
-          <span>Zero Logins</span>
-          <span>•</span>
-          <span>100% Client-Side</span>
-        </div>
-      </section>
+        </section>
 
       {/* -------------------------------------------------------------------- */}
       {/* 2. QUICK PLAY PRESETS */}
