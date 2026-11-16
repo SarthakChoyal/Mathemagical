@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-main: #FAF7EE;
+    --text-main: #111728;
+    --border-main: #111728;
+  }
+
+  .dark {
+    --bg-main: #0B0F19;
+    --text-main: #F8FAFC;
+    --border-main: #2A3554;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+/* Subtle retro halftone / paper noise effect */
+.paper-pattern {
+  background-image: radial-gradient(rgba(17, 23, 40, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.dark .paper-pattern {
+  background-color: #0B0F19;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.12), transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.08), transparent 40%),
+    radial-gradient(rgba(248, 250, 252, 0.07) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 20px 20px;
+}
+
+/* Notebook grid pattern */
+.grid-pattern {
+  background-size: 24px 24px;
+  background-image: 
+    linear-gradient(to right, rgba(17, 23, 40, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(17, 23, 40, 0.05) 1px, transparent 1px);
+}
+
+.dark .grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(250, 247, 238, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(250, 247, 238, 0.05) 1px, transparent 1px);
+}
+
+/* Shiny Text Animation (ReactBits style) */
+@keyframes shiny-text {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.shiny-text {
+  background: linear-gradient(90deg, #FDE047 0%, #FFFFFF 50%, #FDE047 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shiny-text 3s infinite linear;
+}
+
+/* Retro tactile buttons */
+.retro-btn {
+  transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.retro-btn:hover {
+  transform: translate(-1px, -1px);
+}
+
+.retro-btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px rgba(17, 23, 40, 1) !important;
+}
+
+/* Hide spin buttons for number inputs */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Smooth custom scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #F4EEDA;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #151C2E;
+}
+::-webkit-scrollbar-thumb {
+  background: #111728;
+  border-radius: 6px;
+  border: 2px solid #F4EEDA;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #3B82F6;
+  border: 2px solid #151C2E;
+}
