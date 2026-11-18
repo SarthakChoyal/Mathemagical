@@ -16,6 +16,7 @@ import { TimesTablePlayground } from './components/games/TimesTablePlayground';
 import { FractionFrenzy } from './components/games/FractionFrenzy';
 import { NumberSense } from './components/games/NumberSense';
 import { Target100 } from './components/games/Target100';
+import { OperatorBlitz } from './components/games/OperatorBlitz';
 import { ExamMode } from './components/games/ExamMode';
 import { MentalCalculus } from './components/games/MentalCalculus';
 import { MentalAlgebra } from './components/games/MentalAlgebra';
@@ -34,15 +35,27 @@ export const App: React.FC = () => {
     sound.setEnabled(settings.soundEnabled);
   }, []);
 
-  // Sync theme to root class
+  // Sync theme to root class and mobile status bar
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('theme-cream', 'theme-midnight', 'theme-mint', 'theme-lavender', 'dark');
+    root.classList.remove('theme-cream', 'theme-midnight', 'theme-mint', 'theme-lavender', 'theme-blueprint', 'dark');
 
-    if (settings.theme === 'midnight') {
+    const themeColorMeta = document.getElementById('theme-color-meta');
+    const statusBarMeta = document.getElementById('status-bar-meta');
+
+    if (settings.theme === 'midnight' || settings.theme === 'blueprint') {
       root.classList.add('dark');
+      if (settings.theme === 'blueprint') {
+        root.classList.add('theme-blueprint');
+      }
+      const darkBg = settings.theme === 'blueprint' ? '#0B1A32' : '#0B0F19';
+      if (themeColorMeta) themeColorMeta.setAttribute('content', darkBg);
+      if (statusBarMeta) statusBarMeta.setAttribute('content', 'black-translucent');
     } else {
       root.classList.add(`theme-${settings.theme}`);
+      const lightBg = settings.theme === 'mint' ? '#ECF7F0' : '#FAF7EE';
+      if (themeColorMeta) themeColorMeta.setAttribute('content', lightBg);
+      if (statusBarMeta) statusBarMeta.setAttribute('content', 'default');
     }
   }, [settings.theme]);
 
@@ -86,6 +99,7 @@ export const App: React.FC = () => {
 
   const todayStr = new Date().toISOString().split('T')[0];
   const isDailyDoneToday = StorageService.isDailyCompleted(todayStr);
+  const isDarkTheme = settings.theme === 'midnight' || settings.theme === 'blueprint';
 
   return (
     <div className="min-h-screen flex flex-col paper-pattern">
@@ -108,10 +122,11 @@ export const App: React.FC = () => {
           sound.setEnabled(next);
           handleUpdateSettings({ ...settings, soundEnabled: next });
         }}
-        isDark={settings.theme === 'midnight'}
+        isDark={settings.theme === 'midnight' || settings.theme === 'blueprint'}
         onToggleDark={() => {
           sound.playClick();
-          const nextTheme = settings.theme === 'midnight' ? 'cream' : 'midnight';
+          const currentlyDark = settings.theme === 'midnight' || settings.theme === 'blueprint';
+          const nextTheme = currentlyDark ? 'cream' : 'midnight';
           handleUpdateSettings({ ...settings, theme: nextTheme });
         }}
         onOpenSettings={() => {
@@ -206,6 +221,13 @@ export const App: React.FC = () => {
           />
         )}
 
+        {!lastResult && activeGame === 'operators' && (
+          <OperatorBlitz
+            onFinish={handleFinishGame}
+            onExit={handleExitGame}
+          />
+        )}
+
         {!lastResult && activeGame === 'exam' && (
           <ExamMode
             onFinish={handleFinishGame}
@@ -231,6 +253,7 @@ export const App: React.FC = () => {
                 onOpenDaily={() => setCurrentTab('daily')}
                 onOpenStats={() => setCurrentTab('stats')}
                 onOpenStickers={() => setCurrentTab('stickers')}
+                isDark={isDarkTheme}
               />
             )}
 

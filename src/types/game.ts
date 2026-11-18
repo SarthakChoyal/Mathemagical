@@ -7,6 +7,7 @@ export type GameMode =
   | 'fractions'
   | 'numbersense'
   | 'target100'
+  | 'operators'
   | 'exam'
   | 'daily';
 
@@ -34,6 +35,10 @@ export interface Question {
   operation: Operation | 'misc';
   hint?: string;
   explanation?: string; // Rich explanation for exam mode review
+  operatorPuzzle?: {
+    nums: [number, number, number];
+    target: number;
+  };
 }
 
 export interface AnswerRecord {

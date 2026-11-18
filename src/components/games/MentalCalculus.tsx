@@ -8,6 +8,7 @@ import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { NumberPad } from '../common/NumberPad';
 import { Mascot } from '../mascot/Mascot';
+import { MathText } from '../common/MathText';
 
 interface CalculusProps {
   onFinish: (result: GameSessionResult) => void;
@@ -146,13 +147,14 @@ export const MentalCalculus: React.FC<CalculusProps> = ({
           {/* Rules Focus */}
           <div>
             <label className="block font-display font-bold text-sm text-midnight-900 dark:text-cream-100 mb-2">
-              Calculus Focus
+              Calculus Focus (A-Level & Further Maths)
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {[
-                { id: 'diff', name: 'Differentiation (d/dx)', desc: 'Power, chain, trig & exponential rules' },
-                { id: 'int', name: 'Integration (∫)', desc: 'Mental definite integrals & limits' },
-                { id: 'mixed', name: 'Mixed Calculus', desc: 'Balanced rapid drill' },
+                { id: 'mixed', name: 'All Calculus', desc: 'Full syllabus mix' },
+                { id: 'diff', name: 'Differentiation', desc: 'Chain, product, quotient, trig' },
+                { id: 'int', name: 'Integration', desc: 'Rev. chain, parts, arctan' },
+                { id: 'series', name: 'Series & DEs', desc: 'Maclaurin & binomial coeffs' },
               ].map((m) => (
                 <button
                   key={m.id}
@@ -201,14 +203,14 @@ export const MentalCalculus: React.FC<CalculusProps> = ({
           </div>
 
           <div className="p-3.5 rounded-2xl bg-cream-100 dark:bg-slate-800/50 border border-midnight-900/20 dark:border-slate-700 text-xs font-mono text-midnight-900/80 dark:text-cream-200/80 space-y-1">
-            <p className="font-bold text-cobalt-600 dark:text-butter-300">💡 Calculus Pro Tips:</p>
-            <p>• For derivatives, evaluate $f'(x)$ at the specified integer point (e.g. $x = 2$).</p>
-            <p>• Definite integrals $\int_0^b$ evaluate to clean, integer values.</p>
-            <p>• Type negative signs with <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-700 border border-midnight-900 font-bold">-</kbd> when answers are negative.</p>
+            <p className="font-bold text-cobalt-600 dark:text-butter-300">Mental Calculus Tips:</p>
+            <p>• Evaluate derivatives f′(x) at the specified point (e.g. x = 2).</p>
+            <p>• Definite integrals evaluate to clean integer/fraction values (or π chips).</p>
+            <p>• Type negative signs with <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-700 border border-midnight-900 font-bold">-</kbd> or fractions with <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-700 border border-midnight-900 font-bold">/</kbd>.</p>
           </div>
 
           <Button variant="primary" size="xl" fullWidth onClick={startGame} icon={<Play size={20} className="fill-white" />}>
-            START CALCULUS SPRINT
+            START Mental Calculus
           </Button>
         </Card>
       </div>
@@ -249,29 +251,46 @@ export const MentalCalculus: React.FC<CalculusProps> = ({
         )}
 
         <div className="font-mono font-extrabold text-3xl sm:text-4xl text-midnight-950 dark:text-cream-100 my-6 tracking-tight">
-          {currentQuestion?.prompt}
+          <MathText text={currentQuestion?.prompt || ''} />
         </div>
 
-        <input
-          ref={inputRef}
-          type="text"
-          value={userInput}
-          onChange={handleInputChange}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && userInput.trim().length > 0) {
-              handleAnswerSubmit(userInput);
-            }
-          }}
-          placeholder="Answer..."
-          className="w-full max-w-xs mx-auto text-center font-mono font-black text-3xl py-3 rounded-2xl bg-cream-100 dark:bg-slate-800 border-3 border-midnight-900 dark:border-slate-700 shadow-retro focus:outline-none focus:ring-4 focus:ring-cobalt-400 text-midnight-950 dark:text-cream-100"
-        />
-
-        <p className="text-xs font-mono text-midnight-900/50 dark:text-cream-200/50 mt-4">
-          Press Enter or type exact number
-        </p>
+        {currentQuestion?.options ? (
+          <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mt-6">
+            {currentQuestion.options.map((opt, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => handleAnswerSubmit(opt.toString())}
+                className="py-3 px-4 rounded-xl bg-cream-100 dark:bg-slate-800 border-2 border-midnight-900 dark:border-slate-700 font-mono text-xl font-bold text-midnight-950 dark:text-cream-100 shadow-retro-sm hover:bg-butter-200 dark:hover:bg-slate-700 active:translate-x-0.5 active:translate-y-0.5 transition-all"
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <>
+            <input
+              ref={inputRef}
+              type="text"
+              value={userInput}
+              onChange={handleInputChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && userInput.trim().length > 0) {
+                  handleAnswerSubmit(userInput);
+                }
+              }}
+              placeholder="Answer..."
+              className="w-full max-w-xs mx-auto text-center font-mono font-black text-3xl py-3 rounded-2xl bg-cream-100 dark:bg-slate-800 border-3 border-midnight-900 dark:border-slate-700 shadow-retro focus:outline-none focus:ring-4 focus:ring-cobalt-400 text-midnight-950 dark:text-cream-100"
+            />
+            <p className="text-xs font-mono text-midnight-900/50 dark:text-cream-200/50 mt-4">
+              Press Enter or type exact number
+            </p>
+          </>
+        )}
       </Card>
 
-      <div className={alwaysShowKeypad ? 'block' : 'sm:hidden'}>
+      {!currentQuestion?.options && (
+        <div className={alwaysShowKeypad ? 'block' : 'sm:hidden'}>
         <NumberPad
           onInput={(c) => {
             const next = userInput + c;
@@ -288,6 +307,7 @@ export const MentalCalculus: React.FC<CalculusProps> = ({
           allowNegative
         />
       </div>
+      )}
     </div>
   );
 };

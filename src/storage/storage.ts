@@ -179,7 +179,11 @@ export class StorageService {
       const data = localStorage.getItem(SETTINGS_KEY);
       if (!data) return DEFAULT_SETTINGS;
       const parsed = JSON.parse(data);
-      return { ...DEFAULT_SETTINGS, ...parsed };
+      const merged: UserSettings = { ...DEFAULT_SETTINGS, ...parsed };
+      if ((parsed.theme as string) === 'lavender') {
+        merged.theme = 'blueprint';
+      }
+      return merged;
     } catch {
       return DEFAULT_SETTINGS;
     }

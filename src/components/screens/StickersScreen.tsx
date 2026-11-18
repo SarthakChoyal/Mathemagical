@@ -31,7 +31,7 @@ export const StickersScreen: React.FC<StickersScreenProps> = ({ onBack }) => {
         <Mascot mood={progressPercent > 50 ? 'cheering' : 'happy'} size="md" />
         <div>
           <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-midnight-900 dark:text-cream-100">
-            Sticker Album
+            Accolades
           </h1>
           <p className="text-sm font-medium text-midnight-900/60 dark:text-cream-200/60 mt-0.5">
             Collect retro reward badges as your mathematical prowess grows
@@ -45,7 +45,7 @@ export const StickersScreen: React.FC<StickersScreenProps> = ({ onBack }) => {
           <div className="flex items-center gap-2">
             <Sparkles size={18} className="text-midnight-950 dark:text-amber-300" />
             <span className="font-display font-bold text-sm text-midnight-950 dark:text-amber-200">
-              Album Collection Progress
+              Progression
             </span>
           </div>
           <span className="font-mono font-black text-sm text-midnight-950 dark:text-amber-200">

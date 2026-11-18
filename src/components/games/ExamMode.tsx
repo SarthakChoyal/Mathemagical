@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft, Play, Sparkles, GraduationCap, BookOpen, Clock, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Play, GraduationCap } from 'lucide-react';
 import { Question, AnswerRecord, GameSessionResult } from '../../types/game';
-import { generateExamQuestion } from '../../engine/questionGenerator';
+import { generateExamQuestion, ExamTopic } from '../../engine/questionGenerator';
 import { checkAnswer } from '../../engine/evaluator';
 import { sound } from '../../audio/soundEngine';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { NumberPad } from '../common/NumberPad';
-import { Mascot } from '../mascot/Mascot';
+import { MathText } from '../common/MathText';
 
 interface ExamModeProps {
   onFinish: (result: GameSessionResult) => void;
@@ -21,6 +21,7 @@ export const ExamMode: React.FC<ExamModeProps> = ({
   alwaysShowKeypad = false,
 }) => {
   const [gameState, setGameState] = useState<'intro' | 'playing'>('intro');
+  const [examTopic, setExamTopic] = useState<ExamTopic>('all');
   const [questionCount, setQuestionCount] = useState<number>(10);
   const [questionIndex, setQuestionIndex] = useState<number>(0);
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
@@ -44,11 +45,11 @@ export const ExamMode: React.FC<ExamModeProps> = ({
   };
 
   const loadNext = useCallback(() => {
-    const q = generateExamQuestion();
+    const q = generateExamQuestion(examTopic);
     setCurrentQuestion(q);
     setUserInput('');
     qStartTimeRef.current = Date.now();
-  }, []);
+  }, [examTopic]);
 
   useEffect(() => {
     if (gameState === 'playing') {
@@ -121,7 +122,7 @@ export const ExamMode: React.FC<ExamModeProps> = ({
 
   if (gameState === 'intro') {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-8 animate-pop">
+      <div className="w-full max-w-3xl mx-auto px-4 py-8 animate-pop">
         <button
           onClick={onExit}
           className="inline-flex items-center gap-2 font-display text-sm font-bold text-midnight-900 dark:text-cream-100 hover:text-cobalt-600 dark:hover:text-butter-300 mb-6 transition-colors"
@@ -129,53 +130,117 @@ export const ExamMode: React.FC<ExamModeProps> = ({
           <ArrowLeft size={16} /> Back to Hub
         </button>
 
-        <Card variant="white" shadow="lg" className="p-8 text-center space-y-6 dark:bg-slate-900 dark:border-slate-700">
+        <Card variant="white" shadow="lg" className="p-6 sm:p-8 text-center space-y-6 dark:bg-slate-900 dark:border-slate-700">
           <div className="flex justify-center">
-            <span className="text-6xl p-4 rounded-3xl bg-cobalt-100 dark:bg-blue-900/40 border-2 border-midnight-900 dark:border-blue-400 shadow-retro">
-              🎓
+            <span className="p-4 rounded-3xl bg-mint-200 dark:bg-emerald-950/60 border-2 border-midnight-900 dark:border-emerald-500/40 shadow-retro inline-flex items-center justify-center">
+              <GraduationCap size={44} className="text-emerald-700 dark:text-emerald-300" />
             </span>
           </div>
 
           <div>
             <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-midnight-900 dark:text-cream-100">
-              ESAT & TMUA Fluency
+              Admissions Blitz
             </h1>
-            <p className="text-sm font-medium text-midnight-900/60 dark:text-cream-200/60 mt-1 max-w-lg mx-auto">
-              Master rapid calculator-free mental arithmetic under university admissions test pressure.
+            <p className="text-sm font-medium text-midnight-900/60 dark:text-cream-200/60 mt-1 max-w-xl mx-auto">
+              Calculator-free ESAT (Maths 1 &amp; 2) and TMUA mental fluency: procedural traps, bounds, logs, trig, and probability.
             </p>
           </div>
 
           {/* Exam Domains */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-left text-xs font-mono">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left text-xs font-mono">
             <div className="p-3 rounded-xl bg-cream-100 dark:bg-slate-800 border border-midnight-900 dark:border-slate-700">
               <span className="font-display font-bold text-xs text-cobalt-600 dark:text-cobalt-400 block mb-1">
-                Fractional Powers
+                Number, Surds &amp; SI
               </span>
-              Evaluate terms like 8^(2/3) and 16^(-3/4) in seconds.
+              SI prefix jumps, unit traps, rationalising surds, bounds &amp; recurring decimals.
             </div>
 
             <div className="p-3 rounded-xl bg-cream-100 dark:bg-slate-800 border border-midnight-900 dark:border-slate-700">
               <span className="font-display font-bold text-xs text-mint-600 dark:text-emerald-400 block mb-1">
-                Percentages & Ratios
+                Logs, Series &amp; Calculus
               </span>
-              Mental multiplier shifts and compound ratio splits.
+              Log laws, circle radii, S_∞, integral limits, FTC &amp; trapezium estimates.
             </div>
 
             <div className="p-3 rounded-xl bg-cream-100 dark:bg-slate-800 border border-midnight-900 dark:border-slate-700">
               <span className="font-display font-bold text-xs text-cherry-600 dark:text-rose-400 block mb-1">
-                Mental Quadratics
+                Trig, Geom &amp; Prob
               </span>
-              Identify roots and factorizations without pen-and-paper.
+              Trig root counting, 3D Pythagoras, similarity scaling &amp; Binomial E(X).
+            </div>
+          </div>
+
+          {/* Topic Filter */}
+          <div className="text-left">
+            <label className="block font-display font-bold text-sm text-midnight-900 dark:text-cream-100 mb-2">
+              Admissions Focus
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+              {[
+                { id: 'all', name: 'Full Mix', desc: 'ESAT M1/M2 & TMUA' },
+                { id: 'number', name: 'Number & Surds', desc: 'SI, bounds, surds, %' },
+                { id: 'algebra', name: 'Algebra & Logs', desc: 'Circles, S_∞, rem thm' },
+                { id: 'trigcalc', name: 'Trig & Calc', desc: 'Roots, FTC, trapezium' },
+                { id: 'geomprob', name: 'Geom & Prob', desc: 'Scale, 3D, nCr, E(X)' },
+              ].map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    setExamTopic(t.id as ExamTopic);
+                  }}
+                  className={`p-2.5 rounded-xl border-2 border-midnight-900 dark:border-slate-700 font-display text-center transition-all ${
+                    examTopic === t.id
+                      ? 'bg-cobalt-600 text-white shadow-retro'
+                      : 'bg-cream-50 dark:bg-slate-800/60 text-midnight-900 dark:text-cream-100 hover:bg-cream-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <span className="font-bold text-xs block">{t.name}</span>
+                  <span className="text-[10px] opacity-75 block mt-0.5">{t.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Drill Length */}
+          <div className="text-left">
+            <label className="block font-display font-bold text-sm text-midnight-900 dark:text-cream-100 mb-2">
+              Session Length
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { count: 10, label: '10 Qs', sub: 'Quick Sprint' },
+                { count: 20, label: '20 Qs', sub: 'Standard Set' },
+                { count: 27, label: '27 Qs', sub: 'Full ESAT Module' },
+              ].map((opt) => (
+                <button
+                  key={opt.count}
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    setQuestionCount(opt.count);
+                  }}
+                  className={`p-2.5 rounded-xl border-2 border-midnight-900 dark:border-slate-700 font-display text-center transition-all ${
+                    questionCount === opt.count
+                      ? 'bg-emerald-600 text-white shadow-retro'
+                      : 'bg-cream-50 dark:bg-slate-800/60 text-midnight-900 dark:text-cream-100 hover:bg-cream-100 dark:hover:bg-slate-800'
+                  }`}
+                >
+                  <span className="font-bold text-xs block">{opt.label}</span>
+                  <span className="text-[10px] opacity-75 block mt-0.5">{opt.sub}</span>
+                </button>
+              ))}
             </div>
           </div>
 
           {/* Disclaimer */}
           <div className="p-3 rounded-xl bg-butter-100 dark:bg-amber-950/40 border border-midnight-900/30 dark:border-amber-500/30 text-[11px] font-sans text-midnight-900/70 dark:text-amber-200/80 text-left">
-            ℹ️ <strong>Admissions Note:</strong> Calculators are prohibited in the ESAT and TMUA examinations. These drills build raw numerical reflex and mental arithmetic agility. Supplementary exercises; not affiliated with official exam boards.
+            <strong>Admissions Note:</strong> Calculators are prohibited in ESAT and TMUA. All prompts are procedurally generated to sharpen non-calculator speed and accuracy; not affiliated with official exam boards.
           </div>
 
           <Button variant="primary" size="xl" fullWidth onClick={startGame} icon={<Play size={20} className="fill-white" />}>
-            BEGIN EXAM DRILL (10 QUESTIONS)
+            {`BEGIN EXAM DRILL (${questionCount} QUESTIONS)`}
           </Button>
         </Card>
       </div>
@@ -183,7 +248,7 @@ export const ExamMode: React.FC<ExamModeProps> = ({
   }
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-6 select-none animate-pop">
+    <div className="w-full max-w-2xl mx-auto px-4 py-6 select-none animate-pop">
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={onExit}
@@ -208,54 +273,73 @@ export const ExamMode: React.FC<ExamModeProps> = ({
         />
       </div>
 
-      <Card variant="white" shadow="lg" className="p-8 text-center relative dark:bg-slate-900 dark:border-slate-700">
+      <Card variant="white" shadow="lg" className="p-6 sm:p-8 text-center relative dark:bg-slate-900 dark:border-slate-700">
         {currentQuestion?.promptSubtitle && (
           <span className="inline-block px-3 py-0.5 rounded-full bg-cream-200 dark:bg-slate-800 border border-midnight-900 dark:border-slate-700 text-xs font-display font-bold text-midnight-900 dark:text-butter-300 mb-2">
             {currentQuestion.promptSubtitle}
           </span>
         )}
 
-        <div className="font-mono font-extrabold text-3xl sm:text-4xl text-midnight-950 dark:text-cream-100 my-6">
-          {currentQuestion?.prompt}
+        <div className="font-mono font-extrabold text-xl sm:text-3xl leading-snug text-midnight-950 dark:text-cream-100 my-6">
+          <MathText text={currentQuestion?.prompt || ''} />
         </div>
 
-        <input
-          ref={inputRef}
-          type="text"
-          value={userInput}
-          onChange={handleInputChange}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && userInput.trim().length > 0) {
-              handleAnswerSubmit(userInput);
-            }
-          }}
-          placeholder="Answer..."
-          className="w-full max-w-xs mx-auto text-center font-mono font-black text-3xl py-3 rounded-2xl bg-cream-100 dark:bg-slate-800 border-3 border-midnight-900 dark:border-slate-700 shadow-retro focus:outline-none focus:ring-4 focus:ring-cobalt-400 text-midnight-950 dark:text-cream-100"
-        />
+        {currentQuestion?.options ? (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-lg mx-auto mt-6">
+            {currentQuestion.options.map((opt, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => handleAnswerSubmit(opt.toString())}
+                className="py-3 px-4 rounded-xl bg-cream-100 dark:bg-slate-800 border-2 border-midnight-900 dark:border-slate-700 font-mono text-base sm:text-lg font-bold text-midnight-950 dark:text-cream-100 shadow-retro-sm hover:bg-butter-200 dark:hover:bg-slate-700 active:translate-x-0.5 active:translate-y-0.5 transition-all"
+              >
+                <MathText text={opt.toString()} />
+              </button>
+            ))}
+          </div>
+        ) : (
+          <>
+            <input
+              ref={inputRef}
+              type="text"
+              value={userInput}
+              onChange={handleInputChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && userInput.trim().length > 0) {
+                  handleAnswerSubmit(userInput);
+                }
+              }}
+              placeholder="Answer..."
+              className="w-full max-w-xs mx-auto text-center font-mono font-black text-3xl py-3 rounded-2xl bg-cream-100 dark:bg-slate-800 border-3 border-midnight-900 dark:border-slate-700 shadow-retro focus:outline-none focus:ring-4 focus:ring-cobalt-400 text-midnight-950 dark:text-cream-100"
+            />
 
-        <p className="text-xs font-mono text-midnight-900/50 mt-4">
-          Press Enter or type exact answer
-        </p>
+            <p className="text-xs font-mono text-midnight-900/50 dark:text-cream-200/50 mt-4">
+              Press Enter or type exact answer
+            </p>
+          </>
+        )}
       </Card>
 
-      <div className={alwaysShowKeypad ? 'block' : 'sm:hidden'}>
-        <NumberPad
-          onInput={(c) => {
-            const next = userInput + c;
-            setUserInput(next);
-            if (currentQuestion && checkAnswer(next, currentQuestion.answer)) {
-              handleAnswerSubmit(next);
-            }
-          }}
-          onBackspace={() => setUserInput((p) => p.slice(0, -1))}
-          onClear={() => setUserInput('')}
-          onSubmit={() => {
-            if (userInput.trim().length > 0) handleAnswerSubmit(userInput);
-          }}
-          allowFractionSlash
-          allowNegative
-        />
-      </div>
+      {!currentQuestion?.options && (
+        <div className={alwaysShowKeypad ? 'block' : 'sm:hidden'}>
+          <NumberPad
+            onInput={(c) => {
+              const next = userInput + c;
+              setUserInput(next);
+              if (currentQuestion && checkAnswer(next, currentQuestion.answer)) {
+                handleAnswerSubmit(next);
+              }
+            }}
+            onBackspace={() => setUserInput((p) => p.slice(0, -1))}
+            onClear={() => setUserInput('')}
+            onSubmit={() => {
+              if (userInput.trim().length > 0) handleAnswerSubmit(userInput);
+            }}
+            allowFractionSlash
+            allowNegative
+          />
+        </div>
+      )}
     </div>
   );
 };

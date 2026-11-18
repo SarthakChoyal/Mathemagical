@@ -5,6 +5,7 @@ import { GameSessionResult } from '../../types/game';
 import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { Mascot } from '../mascot/Mascot';
+import { MathText } from '../common/MathText';
 import { sound } from '../../audio/soundEngine';
 
 interface ResultsScreenProps {
@@ -230,20 +231,20 @@ Play at: ${window.location.href}`;
               >
                 <div>
                   <span className="font-mono font-bold text-midnight-900 dark:text-cream-100 text-sm">
-                    {rec.question}
+                    <MathText text={rec.question} />
                   </span>
                   {rec.explanation && (
                     <p className="text-[11px] text-midnight-900/70 dark:text-cream-200/70 mt-0.5">
-                      💡 {rec.explanation}
+                      💡 <MathText text={rec.explanation} />
                     </p>
                   )}
                 </div>
                 <div className="text-right shrink-0">
                   <div className="font-mono text-cherry-600 dark:text-cherry-400 line-through">
-                    You: {rec.userAnswer || '(blank)'}
+                    You: {rec.userAnswer ? <MathText text={rec.userAnswer} /> : '(blank)'}
                   </div>
                   <div className="font-mono font-bold text-mint-700 dark:text-mint-400">
-                    Ans: {rec.correctAnswer}
+                    Ans: <MathText text={rec.correctAnswer} />
                   </div>
                 </div>
               </div>

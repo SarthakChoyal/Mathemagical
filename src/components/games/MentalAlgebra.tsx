@@ -8,6 +8,7 @@ import { Button } from '../common/Button';
 import { Card } from '../common/Card';
 import { NumberPad } from '../common/NumberPad';
 import { Mascot } from '../mascot/Mascot';
+import { MathText } from '../common/MathText';
 
 interface AlgebraProps {
   onFinish: (result: GameSessionResult) => void;
@@ -134,10 +135,10 @@ export const MentalAlgebra: React.FC<AlgebraProps> = ({
           <Mascot mood="happy" size="md" />
           <div>
             <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-midnight-900 dark:text-cream-100">
-              Mental Algebra
+              Algebra
             </h1>
             <p className="text-sm font-medium text-midnight-900/60 dark:text-cream-200/60 mt-0.5">
-              Solve equations, quadratic roots, and exponent rules at rapid speed
+              Quadratics, Logs, Exact Trig, Complex Numbers, Matrices & Vectors
             </p>
           </div>
         </div>
@@ -145,13 +146,13 @@ export const MentalAlgebra: React.FC<AlgebraProps> = ({
         <Card variant="white" shadow="lg" className="space-y-6 p-6 dark:bg-midnight-900 dark:border-midnight-800">
           <div>
             <label className="block font-display font-bold text-sm text-midnight-900 dark:text-cream-100 mb-2">
-              Topic Category
+              Syllabus Focus
             </label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {[
-                { id: 'linear', name: 'Linear Equations', desc: 'Solve ax + b = c rapidly' },
-                { id: 'quadratic', name: 'Mental Quadratics', desc: 'Find smaller/larger roots' },
-                { id: 'powers', name: 'Exponent Rules', desc: 'Solve 2^x equations & power laws' },
+                { id: 'mixed', name: 'Full Syllabus Mix', desc: 'Pure Core + Further Maths' },
+                { id: 'pure', name: 'A-Level Pure', desc: 'Quadratics, Logs, Trig, Binomial, GP' },
+                { id: 'further', name: 'Further Maths', desc: 'Complex, 2×2 Matrices, Vectors, Cubics' },
               ].map((m) => (
                 <button
                   key={m.id}
@@ -239,46 +240,64 @@ export const MentalAlgebra: React.FC<AlgebraProps> = ({
           </span>
         )}
 
-        <div className="font-mono font-extrabold text-3xl sm:text-4xl text-midnight-950 dark:text-cream-100 my-6 tracking-tight">
-          {currentQuestion?.prompt}
+        <div className="font-mono font-extrabold text-2xl sm:text-4xl text-midnight-950 dark:text-cream-100 my-6 tracking-tight">
+          <MathText text={currentQuestion?.prompt || ''} />
         </div>
 
-        <input
-          ref={inputRef}
-          type="text"
-          value={userInput}
-          onChange={handleInputChange}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && userInput.trim().length > 0) {
-              handleAnswerSubmit(userInput);
-            }
-          }}
-          placeholder="Answer..."
-          className="w-full max-w-xs mx-auto text-center font-mono font-black text-3xl py-3 rounded-2xl bg-cream-100 dark:bg-slate-800 border-3 border-midnight-900 dark:border-slate-700 shadow-retro focus:outline-none focus:ring-4 focus:ring-butter-400 text-midnight-950 dark:text-cream-100"
-        />
-
-        <p className="text-xs font-mono text-midnight-900/50 dark:text-cream-200/50 mt-4">
-          Press Enter or type exact number
-        </p>
+        {currentQuestion?.options ? (
+          <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto mt-6">
+            {currentQuestion.options.map((opt, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => handleAnswerSubmit(opt.toString())}
+                className="py-3 px-4 rounded-xl bg-cream-100 dark:bg-slate-800 border-2 border-midnight-900 dark:border-slate-700 font-mono text-xl font-bold text-midnight-950 dark:text-cream-100 shadow-retro-sm hover:bg-butter-200 dark:hover:bg-slate-700 active:translate-x-0.5 active:translate-y-0.5 transition-all"
+              >
+                {opt}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <>
+            <input
+              ref={inputRef}
+              type="text"
+              value={userInput}
+              onChange={handleInputChange}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && userInput.trim().length > 0) {
+                  handleAnswerSubmit(userInput);
+                }
+              }}
+              placeholder="Answer..."
+              className="w-full max-w-xs mx-auto text-center font-mono font-black text-3xl py-3 rounded-2xl bg-cream-100 dark:bg-slate-800 border-3 border-midnight-900 dark:border-slate-700 shadow-retro focus:outline-none focus:ring-4 focus:ring-butter-400 text-midnight-950 dark:text-cream-100"
+            />
+            <p className="text-xs font-mono text-midnight-900/50 dark:text-cream-200/50 mt-4">
+              Press Enter or type exact number
+            </p>
+          </>
+        )}
       </Card>
 
-      <div className={alwaysShowKeypad ? 'block' : 'sm:hidden'}>
-        <NumberPad
-          onInput={(c) => {
-            const next = userInput + c;
-            setUserInput(next);
-            if (currentQuestion && checkAnswer(next, currentQuestion.answer)) {
-              handleAnswerSubmit(next);
-            }
-          }}
-          onBackspace={() => setUserInput((p) => p.slice(0, -1))}
-          onClear={() => setUserInput('')}
-          onSubmit={() => {
-            if (userInput.trim().length > 0) handleAnswerSubmit(userInput);
-          }}
-          allowNegative
-        />
-      </div>
+      {!currentQuestion?.options && (
+        <div className={alwaysShowKeypad ? 'block' : 'sm:hidden'}>
+          <NumberPad
+            onInput={(c) => {
+              const next = userInput + c;
+              setUserInput(next);
+              if (currentQuestion && checkAnswer(next, currentQuestion.answer)) {
+                handleAnswerSubmit(next);
+              }
+            }}
+            onBackspace={() => setUserInput((p) => p.slice(0, -1))}
+            onClear={() => setUserInput('')}
+            onSubmit={() => {
+              if (userInput.trim().length > 0) handleAnswerSubmit(userInput);
+            }}
+            allowNegative
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -23,7 +23,7 @@ export interface UserStats {
   unlockedBadgeIds: string[];
 }
 
-export type ThemeName = 'cream' | 'midnight' | 'mint' | 'lavender';
+export type ThemeName = 'cream' | 'mint' | 'midnight' | 'blueprint';
 
 export interface UserSettings {
   soundEnabled: boolean;

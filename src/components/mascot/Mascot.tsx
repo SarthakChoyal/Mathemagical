@@ -8,191 +8,172 @@ interface MascotProps {
   accessory?: 'none' | 'glasses' | 'crown' | 'wizard';
 }
 
+/**
+ * Sleek Retro-Handheld / Geometric Math Emblem ("M-Core")
+ * Inspired by Teenage Engineering, Playdate, and Nintendo Brain Training.
+ */
 export const Mascot: React.FC<MascotProps> = ({
   mood = 'idle',
   streak = 0,
   size = 'md',
   className = '',
-  accessory = 'none',
 }) => {
-  const [isBlinking, setIsBlinking] = useState(false);
+  const [pulse, setPulse] = useState(false);
 
-  // Natural blinking effect
   useEffect(() => {
-    const blinkInterval = setInterval(() => {
-      setIsBlinking(true);
-      setTimeout(() => setIsBlinking(false), 150);
-    }, 3500 + Math.random() * 2000);
-
-    return () => clearInterval(blinkInterval);
+    const interval = setInterval(() => {
+      setPulse(true);
+      setTimeout(() => setPulse(false), 180);
+    }, 3400);
+    return () => clearInterval(interval);
   }, []);
 
-  const sizePx = size === 'sm' ? 44 : size === 'lg' ? 96 : 64;
+  const sizePx = size === 'sm' ? 40 : size === 'lg' ? 88 : 60;
 
-  // Eye states
-  const renderEyes = () => {
-    if (isBlinking && mood !== 'happy' && mood !== 'cheering') {
-      return (
-        <g stroke="#111728" strokeWidth="3" strokeLinecap="round">
-          <line x1="28" y1="36" x2="38" y2="36" />
-          <line x1="52" y1="36" x2="62" y2="36" />
-        </g>
-      );
-    }
+  // Dynamic screen accent color based on mood & streak
+  const screenGlow =
+    mood === 'oops'
+      ? '#F43F5E'
+      : mood === 'cheering' || streak >= 10
+      ? '#34D399'
+      : mood === 'thinking'
+      ? '#A78BFA'
+      : '#38BDF8';
 
-    if (mood === 'happy' || mood === 'cheering' || streak >= 5) {
-      // Happy curved eyes
-      return (
-        <g stroke="#111728" strokeWidth="3.5" fill="none" strokeLinecap="round">
-          <path d="M 28 38 Q 33 30 38 38" />
-          <path d="M 52 38 Q 57 30 62 38" />
-        </g>
-      );
-    }
-
+  const renderDisplay = () => {
     if (mood === 'oops') {
-      // Surprised circle eyes
       return (
-        <g fill="#111728">
-          <circle cx="33" cy="35" r="4.5" />
-          <circle cx="57" cy="35" r="4.5" />
+        <g stroke="#F43F5E" strokeWidth="3.5" strokeLinecap="round">
+          <line x1="34" y1="38" x2="42" y2="46" />
+          <line x1="42" y1="38" x2="34" y2="46" />
+          <line x1="58" y1="38" x2="66" y2="46" />
+          <line x1="66" y1="38" x2="58" y2="46" />
+          <path d="M 38 60 Q 50 54 62 60" fill="none" strokeWidth="3" />
         </g>
       );
     }
 
-    // Default curious eyes with shine
+    if (mood === 'cheering' || streak >= 10) {
+      return (
+        <g stroke="#34D399" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          <polyline points="32,46 38,38 44,46" />
+          <polyline points="56,46 62,38 68,46" />
+          <path d="M 36 57 Q 50 67 64 57" stroke="#FACC15" strokeWidth="3.2" />
+        </g>
+      );
+    }
+
+    if (mood === 'thinking') {
+      return (
+        <g fill="#A78BFA">
+          <rect x="33" y="40" width="9" height="4" rx="2" />
+          <rect x="58" y="38" width="9" height="8" rx="2" />
+          <circle cx="44" cy="60" r="2.2" fill="#FACC15" />
+          <circle cx="50" cy="60" r="2.2" fill="#FACC15" />
+          <circle cx="56" cy="60" r="2.2" fill="#FACC15" />
+        </g>
+      );
+    }
+
+    // Idle / Happy: crisp LED pixel eyes + subtle geometric math symbol
     return (
       <g>
-        <circle cx="33" cy="35" r="5" fill="#111728" />
-        <circle cx="35" cy="33" r="1.8" fill="#FFFFFF" />
-        <circle cx="57" cy="35" r="5" fill="#111728" />
-        <circle cx="59" cy="33" r="1.8" fill="#FFFFFF" />
+        <rect
+          x="34"
+          y={pulse ? '42' : '38'}
+          width="8"
+          height={pulse ? '3' : '10'}
+          rx="2.5"
+          fill={screenGlow}
+          className="transition-all duration-100"
+        />
+        <rect
+          x="58"
+          y={pulse ? '42' : '38'}
+          width="8"
+          height={pulse ? '3' : '10'}
+          rx="2.5"
+          fill={screenGlow}
+          className="transition-all duration-100"
+        />
+        {/* Clean minimal smile / waveform */}
+        <path
+          d="M 41 58 Q 50 63 59 58"
+          fill="none"
+          stroke="#FACC15"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
       </g>
     );
   };
 
-  // Mouth states
-  const renderMouth = () => {
-    if (mood === 'cheering' || streak >= 10) {
-      // Big open happy mouth
-      return (
-        <path
-          d="M 36 45 Q 45 56 54 45 Z"
-          fill="#F43F5E"
-          stroke="#111728"
-          strokeWidth="2.5"
-          strokeLinejoin="round"
-        />
-      );
-    }
-    if (mood === 'happy' || streak >= 3) {
-      // Warm smile
-      return (
-        <path
-          d="M 37 46 Q 45 53 53 46"
-          fill="none"
-          stroke="#111728"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-      );
-    }
-    if (mood === 'oops') {
-      // Small 'o' mouth
-      return (
-        <ellipse cx="45" cy="48" rx="3.5" ry="4.5" fill="#111728" />
-      );
-    }
-    // Gentle smile
-    return (
-      <path
-        d="M 39 46 Q 45 50 51 46"
-        fill="none"
-        stroke="#111728"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
-    );
-  };
-
-  // Accessories
-  const renderAccessory = () => {
-    if (accessory === 'glasses' || streak >= 15) {
-      return (
-        <g stroke="#111728" strokeWidth="2.5" fill="rgba(255,255,255,0.4)">
-          <circle cx="33" cy="35" r="8" />
-          <circle cx="57" cy="35" r="8" />
-          <line x1="41" y1="35" x2="49" y2="35" />
-          <line x1="25" y1="35" x2="20" y2="34" />
-          <line x1="65" y1="35" x2="70" y2="34" />
-        </g>
-      );
-    }
-    if (accessory === 'crown' || streak >= 25) {
-      return (
-        <g fill="#FACC15" stroke="#111728" strokeWidth="2.5" strokeLinejoin="round">
-          <polygon points="32,22 36,12 45,18 54,12 58,22" />
-          <circle cx="45" cy="18" r="1.5" fill="#F43F5E" />
-        </g>
-      );
-    }
-    return null;
-  };
-
   return (
     <div
-      className={`relative inline-block select-none transition-transform duration-200 ${
-        mood === 'cheering' || streak >= 8 ? 'animate-bounce-subtle' : ''
+      className={`inline-flex items-center justify-center relative select-none ${
+        mood === 'cheering' ? 'animate-bounce-subtle' : ''
       } ${className}`}
       style={{ width: sizePx, height: sizePx }}
+      aria-label="Mathemagical Core Emblem"
     >
       <svg
-        viewBox="0 0 90 90"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full drop-shadow-sm"
+        viewBox="0 0 100 100"
+        className="w-full h-full drop-shadow-[3px_3px_0px_#0B0F19]"
       >
-        {/* Antenna / Lightbulb */}
-        <line x1="45" y1="20" x2="45" y2="10" stroke="#111728" strokeWidth="3" strokeLinecap="round" />
-        <circle cx="45" cy="8" r="5" fill="#FDE047" stroke="#111728" strokeWidth="2.5" />
-
-        {/* Mascot Body: Soft squoval retro computer / TV head */}
+        {/* Outer Hardware Chassis */}
         <rect
-          x="16"
-          y="20"
-          width="58"
+          x="8"
+          y="8"
+          width="84"
+          height="84"
+          rx="22"
+          fill="#2563EB"
+          stroke="#0B0F19"
+          strokeWidth="5"
+        />
+
+        {/* Top-left subtle bevel highlight */}
+        <path
+          d="M 22 15 L 78 15"
+          stroke="#60A5FA"
+          strokeWidth="3"
+          strokeLinecap="round"
+          opacity="0.7"
+        />
+
+        {/* Inner Dark OLED Display */}
+        <rect
+          x="18"
+          y="22"
+          width="64"
           height="52"
-          rx="18"
-          fill="#FEF08A"
-          stroke="#111728"
-          strokeWidth="3.5"
-        />
-
-        {/* Screen / Face Area */}
-        <rect
-          x="22"
-          y="25"
-          width="46"
-          height="36"
           rx="12"
-          fill="#FFFDF7"
-          stroke="#111728"
-          strokeWidth="2"
+          fill="#0B0F19"
+          stroke="#1E293B"
+          strokeWidth="2.5"
         />
 
-        {/* Cute rosy cheeks */}
-        <circle cx="28" cy="45" r="3.5" fill="#FDA4AF" opacity="0.8" />
-        <circle cx="62" cy="45" r="3.5" fill="#FDA4AF" opacity="0.8" />
+        {/* Subtle geometric grid lines on OLED */}
+        <line x1="50" y1="24" x2="50" y2="72" stroke="#1E293B" strokeWidth="1" strokeDasharray="3 3" />
+        <line x1="20" y1="48" x2="80" y2="48" stroke="#1E293B" strokeWidth="1" strokeDasharray="3 3" />
 
-        {/* Eyes & Mouth */}
-        {renderEyes()}
-        {renderMouth()}
-        {renderAccessory()}
+        {/* Dynamic LED Face / State */}
+        {renderDisplay()}
 
-        {/* Little Feet */}
-        <ellipse cx="32" cy="74" rx="7" ry="4" fill="#111728" />
-        <ellipse cx="58" cy="74" rx="7" ry="4" fill="#111728" />
+        {/* Bottom Hardware Control Strip (Playdate / Pocket Synth vibe) */}
+        <circle cx="30" cy="82" r="3.5" fill="#FACC15" stroke="#0B0F19" strokeWidth="1.5" />
+        <rect x="42" y="79.5" width="16" height="5" rx="2.5" fill="#1E293B" />
+        <circle cx="70" cy="82" r="3.5" fill={streak >= 5 ? '#34D399' : '#F43F5E'} stroke="#0B0F19" strokeWidth="1.5" />
+
+        {/* Top Antenna / Sigma Crest */}
+        <rect x="44" y="2" width="12" height="7" rx="3" fill="#FACC15" stroke="#0B0F19" strokeWidth="2.5" />
       </svg>
+
+      {streak >= 5 && size !== 'sm' && (
+        <span className="absolute -top-1.5 -right-2 px-1.5 py-0.5 rounded-md bg-butter-300 border-2 border-midnight-950 font-mono font-black text-[10px] text-midnight-950 shadow-retro-sm">
+          {streak}×
+        </span>
+      )}
     </div>
   );
 };
